@@ -1,0 +1,15 @@
+{{ define "bodyclass" }}post{{ end }}
+{{ define "main" }}
+<main class="stage">
+  <div class="page">
+    <header class="site-head"><a class="wordmark" href="/">{{ site.Title }}</a></header>
+    <article id="content">
+      {{ if not .Params.nodate }}<p class="post-date"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time></p>{{ end }}
+      <h1 class="post-heading">{{ .Title }}</h1>
+      <div class="prose">
+        {{ .Content }}
+      </div>
+    </article>
+  </div>
+</main>
+{{ end }}

@@ -1,0 +1,19 @@
+{{ define "bodyclass" }}contact{{ end }}
+{{ define "main" }}
+{{ $inline := dict "display" "inline" }}
+<main class="stage">
+  <div class="page">
+    <header class="site-head"><a class="wordmark" href="/">{{ site.Title }}</a></header>
+    <section id="content" aria-label="{{ .Title }}">
+      <p class="eyebrow">{{ .Title }}</p>
+      {{ with .Params.intro }}<p class="intro">{{ $.RenderString $inline . }}</p>{{ end }}
+      <ul class="contact-list">
+        {{ range .Params.contacts }}
+        <li><span class="c-label">{{ .label }}</span>{{ if .aside }}<span><a class="c-value" href="{{ .href }}">{{ .value }}</a><a class="c-aside" href="{{ .aside_href }}">{{ .aside }}</a></span>{{ else }}<a class="c-value" href="{{ .href }}">{{ .value }}</a>{{ end }}</li>
+        {{ end }}
+      </ul>
+      {{ with .Params.vcard }}<a class="vcard" href="{{ . }}">Download vCard</a>{{ end }}
+    </section>
+  </div>
+</main>
+{{ end }}

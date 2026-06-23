@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language.Locale | default "en" }}">
+{{ partial "head.html" . }}
+<body class="{{ block "bodyclass" . }}{{ end }}">
+  <a class="skip" href="#content">Skip to content</a>
+  {{ block "main" . }}{{ end }}
+</body>
+</html>

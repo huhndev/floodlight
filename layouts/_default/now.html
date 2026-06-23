@@ -1,0 +1,19 @@
+{{ define "bodyclass" }}now{{ end }}
+{{ define "main" }}
+{{ $inline := dict "display" "inline" }}
+<main class="stage">
+  <div class="page">
+    <header class="site-head"><a class="wordmark" href="/">{{ site.Title }}</a></header>
+    <section id="content" aria-label="{{ .Title }}">
+      <p class="eyebrow">{{ .Title }}</p>
+      {{ with .Params.lead }}<p class="now-lead">{{ . }}</p>{{ end }}
+      <ul class="now-list">
+        {{ range .Params.items }}
+        <li>{{ $.RenderString $inline . }}</li>
+        {{ end }}
+      </ul>
+      {{ with .Params.updated }}<p class="now-updated">{{ . }}</p>{{ end }}
+    </section>
+  </div>
+</main>
+{{ end }}

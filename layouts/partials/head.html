@@ -1,0 +1,28 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {{ if site.Params.cloudflare }}
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; font-src 'self'; img-src 'self'; connect-src https://cloudflareinsights.com">
+  {{ else }}
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; style-src 'self'; font-src 'self'; img-src 'self'">
+  {{ end }}
+  <meta name="referrer" content="no-referrer">
+
+  {{ $desc := .Description | default site.Params.description }}
+  <meta name="description" content="{{ $desc }}">
+
+  <meta property="og:title" content="{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }}{{ end }}">
+  <meta property="og:description" content="{{ $desc }}">
+  <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+  <meta property="og:url" content="{{ .Permalink }}">
+  <meta property="og:site_name" content="{{ site.Title }}">
+
+  <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} &mdash; {{ site.Title }}{{ end }}</title>
+
+  <link rel="canonical" href="{{ .Permalink }}">
+  <link rel="alternate" type="application/rss+xml" href="{{ site.Params.rssUrl | default "/index.xml" }}" title="{{ site.Title }}">
+  {{ with site.Params.cloudflare }}<link rel="preconnect" href="https://static.cloudflareinsights.com">{{ end }}
+
+  {{ $css := resources.Get "css/theme.css" | minify | fingerprint }}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+</head>

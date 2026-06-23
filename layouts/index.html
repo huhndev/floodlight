@@ -1,0 +1,46 @@
+{{ define "bodyclass" }}home{{ end }}
+{{ define "main" }}
+{{ $inline := dict "display" "inline" }}
+<main class="stage">
+  <div class="page">
+    <div class="identity">
+      <header class="site-head">
+        <span class="wordmark">{{ site.Title }}</span>
+        {{ with site.Params.lead }}<p class="lead">{{ . }}</p>{{ end }}
+      </header>
+      {{ with site.Params.ctas }}
+      <div class="cta-actions">
+        {{ range . }}
+        <a class="btn btn--{{ .style | default "ghost" }}" href="{{ .url }}">{{ .label }}{{ if .arrow }} <span aria-hidden="true">&rarr;</span>{{ end }}</a>
+        {{ end }}
+      </div>
+      {{ end }}
+      <section class="about" aria-label="About">
+        {{ with site.Params.bio }}<p class="about__bio">{{ $.RenderString $inline . }}</p>{{ end }}
+        {{ with site.Params.hobbies }}<p class="about__hobbies">{{ $.RenderString $inline . }}</p>{{ end }}
+      </section>
+    </div>
+    <div class="main">
+      <section class="content" id="content" aria-label="Writing">
+        <p class="eyebrow">Writing</p>
+        <ul class="posts">
+          {{ $posts := (where site.RegularPages "Section" "blog").ByDate.Reverse }}
+          {{ range first (site.Params.posts_limit | default 5) $posts }}
+          <li class="post"><a class="post-link" href="{{ .RelPermalink }}"><time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time><span class="post-title">{{ .Title }}</span></a></li>
+          {{ end }}
+        </ul>
+      </section>
+      {{ with site.Params.projects }}
+      <section class="projects" aria-label="Public projects">
+        <p class="eyebrow">Projects</p>
+        <ul class="proj-list">
+          {{ range . }}
+          <li class="proj"><a class="proj__name" href="{{ .url }}">{{ .name }}</a>{{ with .desc }}<span class="proj__desc">{{ . }}</span>{{ end }}</li>
+          {{ end }}
+        </ul>
+      </section>
+      {{ end }}
+    </div>
+  </div>
+</main>
+{{ end }}

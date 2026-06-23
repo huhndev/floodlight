@@ -1,0 +1,11 @@
+name = "Floodlight"
+license = "MIT"
+description = "Black canvas, one fluoro-yellow accent, system fonts, no JavaScript."
+homepage = "https://huhn.dev"
+tags = ["blog", "minimal", "dark"]
+features = ["blog"]
+min_version = "0.110"
+
+[author]
+  name = "Julian Huhn"
+  homepage = "https://huhn.dev"
