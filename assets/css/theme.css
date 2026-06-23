@@ -8,7 +8,7 @@
   --code-bg:#121210; --code-bd:#1f1f1c;
   --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,"Cascadia Code",Consolas,monospace;
   --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,system-ui,sans-serif;
-  --col:minmax(13rem,16rem) 1fr;
+  --col:minmax(17rem,20rem) 1fr;
   --col-gap:clamp(2rem,5vw,3.5rem);
 }
 
@@ -71,14 +71,15 @@ ul{list-style:none;margin:0;padding:0}
 .post-date{font-family:var(--mono);font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
 .post-title{font-family:var(--mono);color:var(--ink);font-size:clamp(.92rem,3.3vw,1.02rem);font-weight:500;transition:color .15s ease}
 .post-link:hover .post-title{color:var(--neon)}
-.proj-list{display:flex;flex-direction:column;gap:.7rem}
-.proj{padding:0 .65rem}
+.proj-list{display:flex;flex-direction:column;gap:.15rem}
+.proj-link{display:flex;gap:.65rem;align-items:baseline;color:inherit;padding:.6rem .65rem;border-radius:8px;transition:background .15s ease}
+.proj-link:hover{background:var(--neon-06)}
 .proj__name{font-family:var(--mono);color:var(--ink);font-size:clamp(.92rem,3.3vw,1.02rem);font-weight:500;transition:color .15s ease}
-.proj__name:hover{color:var(--neon)}
-.proj__desc{margin-left:.5rem;color:var(--muted);font-size:.95rem}
+.proj-link:hover .proj__name{color:var(--neon)}
+.proj__desc{color:var(--muted);font-size:.95rem}
 
 @media (min-width:52rem){
-  .home .page{display:grid;max-width:52rem;grid-template-columns:var(--col);column-gap:var(--col-gap);align-content:start}
+  .home .page{display:grid;max-width:56rem;grid-template-columns:var(--col);column-gap:var(--col-gap);align-content:start}
   .home .identity{grid-column:1}
   .home .main{grid-column:2}
   .home .content{margin-top:0}

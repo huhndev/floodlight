@@ -35,7 +35,7 @@
         <p class="eyebrow">Projects</p>
         <ul class="proj-list">
           {{ range . }}
-          <li class="proj"><a class="proj__name" href="{{ .url }}">{{ .name }}</a>{{ with .desc }}<span class="proj__desc">{{ . }}</span>{{ end }}</li>
+          <li class="proj"><a class="proj-link" href="{{ .url }}"><span class="proj__name">{{ .name }}</span>{{ with .desc }}<span class="proj__desc">{{ . }}</span>{{ end }}</a></li>
           {{ end }}
         </ul>
       </section>
