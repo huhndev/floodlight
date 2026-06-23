@@ -1,6 +1,6 @@
 name = "Floodlight"
-license = "MIT"
-description = "Black canvas, one fluoro-yellow accent, system fonts, no JavaScript."
+license = "ISC"
+description = "Minimal, fast, no-JavaScript dark theme with a single neon accent."
 homepage = "https://huhn.dev"
 tags = ["blog", "minimal", "dark"]
 features = ["blog"]
