@@ -5,14 +5,21 @@
   <div class="page">
     <header class="site-head"><a class="wordmark" href="/"><span class="wm-text">{{ site.Title }}</span></a></header>
     <section id="content" aria-label="{{ .Title }}">
-      <p class="eyebrow">{{ .Title }}</p>
-      {{ with .Params.lead }}<p class="now-lead">{{ . }}</p>{{ end }}
-      <ul class="now-list">
-        {{ range .Params.items }}
-        <li>{{ $.RenderString $inline . }}</li>
+      {{ with .Params.lead }}<div class="cc-lead"><p class="biglead">{{ $.RenderString $inline . }}</p></div>{{ end }}
+      <div class="now-cats">
+        {{ range .Params.categories }}
+        <div class="now-cat">
+          <span class="label">{{ .label }}</span>
+          <div class="entries">
+            {{ range .items }}<span class="entry">{{ $.RenderString $inline . }}</span>{{ end }}
+          </div>
+        </div>
         {{ end }}
-      </ul>
-      {{ with .Params.updated }}<p class="now-updated">{{ . }}</p>{{ end }}
+      </div>
+      <div class="now-meta">
+        {{ with .Params.city }}<span class="now-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>{{ . }}</span>{{ end }}
+        {{ with .Params.updated }}<span class="now-pill">{{ . }}</span>{{ end }}
+      </div>
     </section>
   </div>
 </main>
