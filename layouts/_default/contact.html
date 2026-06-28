@@ -3,7 +3,7 @@
 {{ $inline := dict "display" "inline" }}
 <main class="stage">
   <div class="page">
-    <header class="site-head"><a class="wordmark" href="/">{{ site.Title }}</a></header>
+    <header class="site-head"><a class="wordmark" href="/"><span class="wm-text">{{ site.Title }}</span></a></header>
     <section id="content" aria-label="{{ .Title }}">
       <p class="eyebrow">{{ .Title }}</p>
       {{ with .Params.intro }}<p class="intro">{{ $.RenderString $inline . }}</p>{{ end }}
