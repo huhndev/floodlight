@@ -46,6 +46,8 @@ ul{list-style:none;margin:0;padding:0}
 /* ---- Inline link ---- */
 .ilink,.about a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--mag-ul);text-underline-offset:3px;transition:color .15s ease,text-decoration-color .15s ease}
 .ilink:hover,.about a:hover{color:var(--mag-text);text-decoration-color:var(--mag)}
+/* Hobbies line is muted; keep its inline links the same color (still underlined) */
+.about__hobbies a{color:inherit}
 
 /* ===== HOME (body.home) ===== */
 .home .page{max-width:40rem;padding:clamp(2.75rem,9vw,5.5rem) clamp(1.25rem,5vw,2rem) clamp(3rem,9vw,5rem)}
