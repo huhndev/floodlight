@@ -5,6 +5,7 @@
   <div class="page">
     <header class="site-head"><a class="wordmark" href="/"><span class="wm-text">{{ site.Title }}</span></a></header>
     <section id="content" aria-label="{{ .Title }}">
+      <h1 class="visually-hidden">{{ .Title }}</h1>
       <div class="cc-lead"><p class="biglead">{{ $.RenderString $inline .Params.intro }}</p></div>
       <div class="cc-cards">
         {{ range .Params.contacts }}

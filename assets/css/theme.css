@@ -10,8 +10,8 @@
   --mag-wash:rgba(255,45,168,.15); --mag-ul:rgba(255,73,180,.5);
   --code-bg:#121210; --code-bd:#1f1f1c; --wash:rgba(243,243,239,.05);
   --code-ink:#e8e8e2; --code-inline-bg:rgba(236,255,0,.09);
-  --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,"Cascadia Code",Consolas,monospace;
-  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,"Cascadia Code",Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,system-ui,sans-serif;
   --col:minmax(17rem,20rem) 1fr;
   --col-gap:clamp(2rem,5vw,3.5rem);
 }
@@ -27,6 +27,7 @@ ul{list-style:none;margin:0;padding:0}
 
 .skip{position:absolute;left:.75rem;top:.55rem;z-index:60;transform:translateY(-160%);background:var(--neon);color:#0a0a0a;font-weight:600;font-size:.85rem;padding:.5rem .8rem;border-radius:5px;transition:transform .15s ease}
 .skip:focus{transform:none}
+.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 
 /* ---- Layout ---- */
 .stage{min-height:100vh;display:flex;justify-content:center;align-items:flex-start}
@@ -50,7 +51,7 @@ ul{list-style:none;margin:0;padding:0}
 .home .page{max-width:40rem;padding:clamp(2.75rem,9vw,5.5rem) clamp(1.25rem,5vw,2rem) clamp(3rem,9vw,5rem)}
 .home .page::before{background:radial-gradient(34% 40% at 24% 0%,var(--neon-12),transparent 64%)}
 .home .site-head{margin-bottom:0}
-.home .wordmark{font-size:clamp(2.3rem,11vw,3.6rem);letter-spacing:-.03em;text-shadow:0 0 28px rgba(236,255,0,.30)}
+.home .wordmark{margin:0;font-size:clamp(2.3rem,11vw,3.6rem);letter-spacing:-.03em;text-shadow:0 0 28px rgba(236,255,0,.30)}
 .home .wordmark::after{content:"";display:block;width:2.6rem;height:3px;margin:.7rem auto 0 0;border-radius:2px;background:var(--neon);box-shadow:0 0 16px rgba(236,255,0,.4)}
 .lead{margin-top:.9rem;max-width:30ch;color:var(--ink);font-weight:600;font-size:clamp(1.1rem,4.2vw,1.4rem);line-height:1.3;letter-spacing:-.01em}
 

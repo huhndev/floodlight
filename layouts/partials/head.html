@@ -2,21 +2,56 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  {{ if site.Params.cloudflare }}
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; font-src 'self'; img-src 'self'; connect-src https://cloudflareinsights.com">
-  {{ else }}
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; style-src 'self'; font-src 'self'; img-src 'self'">
+
+  {{/* ---- Structured data (JSON-LD). Built first so its hash can feed the CSP. ---- */}}
+  {{ $ld := "" }}
+  {{ if .IsHome }}
+    {{ $website := dict "@type" "WebSite" "@id" (printf "%s#website" site.BaseURL) "url" site.BaseURL "name" site.Title "inLanguage" (site.Language.Lang | default "en") }}
+    {{ with site.Params.description }}{{ $website = merge $website (dict "description" .) }}{{ end }}
+    {{ $person := dict "@type" "Person" "@id" (printf "%s#person" site.BaseURL) "name" site.Params.author.name "url" site.BaseURL }}
+    {{ with site.Params.author.jobTitle }}{{ $person = merge $person (dict "jobTitle" .) }}{{ end }}
+    {{ with site.Params.author.sameAs }}{{ $person = merge $person (dict "sameAs" .) }}{{ end }}
+    {{ with site.Params.author.worksFor }}{{ $person = merge $person (dict "worksFor" (dict "@type" "Organization" "name" .name "url" .url)) }}{{ end }}
+    {{ $ld = jsonify (dict "@context" "https://schema.org" "@graph" (slice $website $person)) }}
+  {{ else if and .IsPage (eq .Section "blog") }}
+    {{ $author := dict "@type" "Person" "name" site.Params.author.name "url" site.BaseURL }}
+    {{ $posting := dict "@context" "https://schema.org" "@type" "BlogPosting" "headline" .Title "url" .Permalink "mainEntityOfPage" (dict "@type" "WebPage" "@id" .Permalink) "datePublished" (.Date.Format "2006-01-02T15:04:05Z07:00") "dateModified" (.Lastmod.Format "2006-01-02T15:04:05Z07:00") "author" $author "publisher" $author "inLanguage" (site.Language.Lang | default "en") }}
+    {{ with .Description | default site.Params.description }}{{ $posting = merge $posting (dict "description" .) }}{{ end }}
+    {{ $ld = jsonify $posting }}
   {{ end }}
+
+  {{/* ---- Content-Security-Policy (per-page: includes the inline JSON-LD hash when present) ---- */}}
+  {{ $ldhash := "" }}
+  {{ with $ld }}{{ $ldhash = (resources.FromString (path.Join "_jsonld" $.RelPermalink "ld.json") . | fingerprint "sha256").Data.Integrity }}{{ end }}
+  {{ $script := slice }}
+  {{ if site.Params.cloudflare }}{{ $script = $script | append "'self'" "https://static.cloudflareinsights.com" }}{{ end }}
+  {{ with $ldhash }}{{ $script = $script | append (printf "'%s'" .) }}{{ end }}
+  {{ $script = cond (gt (len $script) 0) (delimit $script " ") "'none'" }}
+  {{ $csp := printf "default-src 'none'; base-uri 'none'; form-action 'none'; script-src %s; style-src 'self'; font-src 'self'; img-src 'self'" $script }}
+  {{ if site.Params.cloudflare }}{{ $csp = printf "%s; connect-src https://cloudflareinsights.com" $csp }}{{ end }}
+  <meta http-equiv="Content-Security-Policy" content="{{ $csp }}">
   <meta name="referrer" content="no-referrer">
 
   {{ $desc := .Description | default site.Params.description }}
+  {{ $ogtitle := cond .IsHome site.Title .Title }}
   <meta name="description" content="{{ $desc }}">
 
-  <meta property="og:title" content="{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }}{{ end }}">
+  <meta property="og:title" content="{{ $ogtitle }}">
   <meta property="og:description" content="{{ $desc }}">
   <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
   <meta property="og:url" content="{{ .Permalink }}">
   <meta property="og:site_name" content="{{ site.Title }}">
+  {{ with site.Params.ogLocale }}<meta property="og:locale" content="{{ . }}">{{ end }}
+  {{ if and .IsPage (eq .Section "blog") }}
+  <meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+  <meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+  <meta property="article:author" content="{{ site.Params.author.name }}">
+  {{ end }}
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ $ogtitle }}">
+  <meta name="twitter:description" content="{{ $desc }}">
+  {{ with site.Params.author.twitter }}<meta name="twitter:creator" content="{{ . }}">{{ end }}
 
   <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} &mdash; {{ site.Title }}{{ end }}</title>
 
@@ -26,4 +61,6 @@
 
   {{ $css := resources.Get "css/theme.css" | minify | fingerprint }}
   <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+
+  {{ with $ld }}<script type="application/ld+json">{{ . | safeJS }}</script>{{ end }}
 </head>
