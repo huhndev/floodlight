@@ -6,6 +6,20 @@
     <article id="content">
       {{ if not .Params.nodate }}<p class="post-date"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time></p>{{ end }}
       <h1 class="post-heading">{{ .Title }}</h1>
+      {{ with .Params.updates }}
+      <div class="post-updates">
+        {{ $total := len . }}
+        {{ range $i, $u := (collections.Reverse .) }}
+        <div class="post-update">
+          <div class="post-update__head">
+            <span class="post-update__label">Update #{{ sub $total $i }}</span>
+            {{ with $u.date }}<time class="post-update__date" datetime="{{ time.Format "2006-01-02" . }}">{{ time.Format "2006-01-02" . }}</time>{{ end }}
+          </div>
+          <div class="post-update__text">{{ $.RenderString (dict "display" "inline") $u.text }}</div>
+        </div>
+        {{ end }}
+      </div>
+      {{ end }}
       <div class="prose">
         {{ .Content }}
       </div>

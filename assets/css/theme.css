@@ -143,6 +143,16 @@ ul{list-style:none;margin:0;padding:0}
 .prose li::marker{color:var(--muted)}
 .prose hr{border:none;border-top:1px solid var(--code-bd);margin:2rem 0}
 
+/* ---- Update log (magenta cards below the headline) ---- */
+.post-updates{margin:1rem 0 0;display:flex;flex-direction:column;gap:.6rem}
+.post-update{padding:.6rem .8rem;background:var(--mag-wash);border:1px solid var(--mag-ul);border-radius:10px}
+.post-update__head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:.4rem .9rem}
+.post-update__label{font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mag-text)}
+.post-update__date{font-family:var(--mono);font-size:.7rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.post-update__text{margin-top:.3rem;font-family:var(--mono);font-size:.82rem;line-height:1.55;color:var(--bio)}
+.post-update__text a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--mag-ul);text-underline-offset:3px;transition:color .15s ease,text-decoration-color .15s ease}
+.post-update__text a:hover{color:var(--mag-text);text-decoration-color:var(--mag)}
+
 /* ===== LIGHT MODE — "Tageslicht" (warm paper) ===== */
 @media (prefers-color-scheme: light){
   :root{
