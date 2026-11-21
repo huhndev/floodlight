@@ -1,0 +1,101 @@
+{{/*
+  Link-preview card (1200x627) for the current page, drawn entirely with Hugo's
+  image filters: no image files, no external tools. Colours are read from the
+  theme stylesheet; text comes from site params and the page.
+  Returns an image resource published as og.png next to the page.
+*/}}
+{{- $W := 1200 }}{{ $H := 627 }}{{ $X := 84 }}
+
+{{- /* Palette: first (dark) definition of each custom property in theme.css. */}}
+{{- $css := (resources.Get "css/theme.css").Content }}
+{{- $c := dict }}
+{{- $keys := slice "bg" "ink" "bio" "muted" "neon" "mag" }}
+{{- range $k := $keys }}
+  {{- with findRESubmatch (printf `--%s:\s*(#[0-9a-fA-F]{6})\b` $k) $css 1 }}{{ $c = merge $c (dict $k (index . 0 1)) }}{{ end }}
+{{- end }}
+{{- if ne (len $c) (len $keys) }}{{ errorf "og-image.html: could not read all colours (%v) from css/theme.css" $keys }}{{ end }}
+
+{{- /* Every shape starts from one transparent pixel, grown with images.Padding. */}}
+{{- $px := resources.FromString "og/px.png" (base64Decode "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAXpeqz8AAAAASUVORK5CYII=") }}
+
+{{- /* Background: base colour, neon wash top-left, magenta wash bottom-right. */}}
+{{- $bg := $px.Filter (images.Padding 0 (sub $W 1) (sub $H 1) 0 $c.bg) }}
+{{- $neonWash := $px.Filter (images.Padding 0 459 299 0 $c.neon) (images.Padding 220 220 220 220 "#00000000") (images.GaussianBlur 110) (images.Opacity 0.22) }}
+{{- $magWash := $px.Filter (images.Padding 0 399 279 0 $c.mag) (images.Padding 220 220 220 220 "#00000000") (images.GaussianBlur 120) (images.Opacity 0.12) }}
+{{- $bg = $bg.Filter (images.Overlay $neonWash -260 -420) (images.Overlay $magWash 780 360) }}
+
+{{- /* Text layer: transparent canvas `w` wide (Hugo wraps text at its edge), optional faux bold. */}}
+{{- define "partials/inline/og-text.html" }}
+  {{- $layer := .px.Filter (images.Padding 0 (sub .w 1) (sub .h 1) 0 "#00000000") }}
+  {{- $f := slice }}
+  {{- range $dx := seq 0 (.bold | default 0) }}
+    {{- $f = $f | append (images.Text $.text (dict "color" $.color "size" $.size "x" $dx "y" 0 "linespacing" ($.spacing | default 0))) }}
+  {{- end }}
+  {{- return images.Filter $f $layer }}
+{{- end }}
+
+{{- /* Rough line count for Hugo's default font (Go Regular, ~0.53em per character).
+     Text layers are only as tall as this estimate, so every text below is also
+     truncated to fit its line limit; nothing gets cut off without an ellipsis. */}}
+{{- define "partials/inline/og-lines.html" }}
+  {{- $perLine := math.Max 1 (math.Floor (div (float .w) (mul (float .size) 0.53))) }}
+  {{- return int (math.Ceil (div (float (strings.RuneCount .text)) $perLine)) }}
+{{- end }}
+
+{{- $img := $bg }}
+{{- if .IsHome }}
+  {{- $word := site.Title }}
+  {{- $lead := site.Params.lead | default "" | plainify | truncate 80 | htmlUnescape }}
+  {{- $sub := .Description | default site.Params.description | plainify | truncate 140 | htmlUnescape }}
+  {{- $leadLines := int (math.Min 2 (partial "inline/og-lines.html" (dict "text" $lead "w" 1000 "size" 42))) }}
+  {{- $subLines := int (math.Min 3 (partial "inline/og-lines.html" (dict "text" $sub "w" 760 "size" 28))) }}
+  {{- $blockH := add 120 30 5 (cond (ne $lead "") (add 40 (mul $leadLines 50)) 0) (cond (ne $sub "") (add 18 (mul $subLines 38)) 0) }}
+  {{- $y := div (sub $H $blockH) 2 }}
+
+  {{- $mark := partial "inline/og-text.html" (dict "px" $px "text" $word "w" 1100 "h" 170 "size" 124 "color" $c.neon "bold" 3) }}
+  {{- $glow := $mark.Filter (images.Padding 40 40 40 40 "#00000000") (images.GaussianBlur 18) (images.Opacity 0.55) }}
+  {{- $bar := $px.Filter (images.Padding 0 75 4 0 $c.neon) }}
+  {{- $barGlow := $bar.Filter (images.Padding 20 20 20 20 "#00000000") (images.GaussianBlur 8) }}
+  {{- $img = $img.Filter (images.Overlay $glow (sub $X 40) (sub $y 40)) (images.Overlay $mark $X $y) }}
+  {{- $y = add $y 120 30 }}
+  {{- $img = $img.Filter (images.Overlay $barGlow (sub $X 20) (sub $y 20)) (images.Overlay $bar $X $y) }}
+  {{- $y = add $y 5 }}
+  {{- with $lead }}
+    {{- $y = add $y 40 }}
+    {{- $img = $img.Filter (images.Overlay (partial "inline/og-text.html" (dict "px" $px "text" . "w" 1000 "h" (mul $leadLines 50) "size" 42 "color" $c.ink "bold" 1 "spacing" 6)) $X $y) }}
+    {{- $y = add $y (mul $leadLines 50) }}
+  {{- end }}
+  {{- with $sub }}
+    {{- $y = add $y 18 }}
+    {{- $img = $img.Filter (images.Overlay (partial "inline/og-text.html" (dict "px" $px "text" . "w" 760 "h" (mul $subLines 38) "size" 28 "color" $c.bio "spacing" 8)) $X $y) }}
+  {{- end }}
+
+{{- else }}
+  {{- /* Inner pages: small wordmark, optional date, page title, description. */}}
+  {{- $title := .Title | plainify | truncate 90 | htmlUnescape }}
+  {{- $size := cond (gt (strings.RuneCount $title) 34) 58 70 }}
+  {{- $lineH := add $size 10 }}
+  {{- $titleLines := int (math.Min 3 (partial "inline/og-lines.html" (dict "text" $title "w" 1032 "size" $size))) }}
+  {{- $desc := .Description | default site.Params.description | plainify | truncate 150 | htmlUnescape }}
+  {{- $descLines := int (math.Min 3 (partial "inline/og-lines.html" (dict "text" $desc "w" 900 "size" 28))) }}
+
+  {{- $img = $img.Filter (images.Overlay (partial "inline/og-text.html" (dict "px" $px "text" site.Title "w" 600 "h" 60 "size" 40 "color" $c.neon "bold" 1)) $X 64) }}
+  {{- $img = $img.Filter (images.Overlay ($px.Filter (images.Padding 0 43 3 0 $c.neon)) $X 122) }}
+
+  {{- $meta := cond (and .IsPage (eq .Section "blog")) (.Date.Format "2006-01-02") "" }}
+  {{- $blockH := add (cond (ne $meta "") 52 0) (mul $titleLines $lineH) (cond (ne $desc "") (add 26 (mul $descLines 38)) 0) }}
+  {{- $y := math.Max 170 (add 132 (div (sub (sub $H 132) $blockH) 2)) | int }}
+  {{- with $meta }}
+    {{- $img = $img.Filter (images.Overlay (partial "inline/og-text.html" (dict "px" $px "text" . "w" 400 "h" 40 "size" 26 "color" $c.muted)) $X $y) }}
+    {{- $y = add $y 52 }}
+  {{- end }}
+  {{- $img = $img.Filter (images.Overlay (partial "inline/og-text.html" (dict "px" $px "text" $title "w" 1032 "h" (mul $titleLines $lineH) "size" $size "color" $c.ink "bold" 2 "spacing" 10)) $X $y) }}
+  {{- $y = add $y (mul $titleLines $lineH) }}
+  {{- with $desc }}
+    {{- $y = add $y 26 }}
+    {{- $img = $img.Filter (images.Overlay (partial "inline/og-text.html" (dict "px" $px "text" . "w" 900 "h" (mul $descLines 38) "size" 28 "color" $c.bio "spacing" 8)) $X $y) }}
+  {{- end }}
+{{- end }}
+
+{{- $img = $img | resources.Copy (path.Join .RelPermalink "og.png") }}
+{{- return $img }}
